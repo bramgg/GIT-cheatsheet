@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="nl">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   GIT Terminal Cheat Sheet - Interactief
+  </title>
+  <style>
+   body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 2em;
+        }
+        h1 {
+            color: #333;
+        }
+        section {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 2em;
+            padding: 1.5em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+            position: relative;
+        }
+        button.copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.3em;
+            margin-top: 0;
+        }
+        #toc, #input-section {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 1em;
+            margin-bottom: 2em;
+            border-radius: 5px;
+        }
+        .input-group {
+            margin-bottom: 1em;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"] {
+            padding: 0.5em;
+            font-size: 1em;
+            width: 300px;
+        }
+        #generate-btn {
+            padding: 0.5em 1em;
+            font-size: 1em;
+            margin-top: 1em;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .branch-options {
+            margin-top: 0.5em;
+        }
+  </style>
+ </head>
+ <body>
+  <div id="url-generator" style="background:#f1f1f1; border:1px solid #ccc; padding:0.8em; border-radius:5px; margin-bottom:1em; display:flex; gap:20px; align-items:flex-end;">
+   <div style="flex:1;">
+    <input id="gh-username" placeholder="Gebruikersnaam" style="width:100%; padding:0.4em;" type="text" value="bramgg"/>
+    <div style="font-size:0.8em; color:#555;">
+     GitHub gebruikersnaam
+    </div>
+   </div>
+   <div style="flex:1;">
+    <input id="gh-repo" placeholder="Repo-naam" style="width:100%; padding:0.4em;" type="text" value="GIT-cheatsheet"/>
+    <div style="font-size:0.8em; color:#555;">
+     Repo-naam
+    </div>
+   </div>
+   <div style="flex:2;">
+    <input id="gh-file" placeholder="Bestandsnaam.html" style="width:100%; padding:0.4em;" type="text"/>
+    <div style="font-size:0.8em; color:#555;">
+     HTML-bestand
+    </div>
+   </div>
+   <div style="flex:0 0 auto;">
+    <button onclick="generateGitHubURL()" style="padding:0.5em 1em; background:#007BFF; color:white; border:none; border-radius:5px;">
+     Genereer URL
+    </button>
+   </div>
+  </div>
+  <div id="gh-url-output" style="display:none; margin-bottom:1.5em;">
+   <label style="font-size:0.9em;">
+    Volledige URL:
+   </label>
+   <br/>
+   <input id="gh-full-url" readonly="" style="width:100%; padding:0.5em;" type="text"/>
+   <button onclick="copyGitHubURL()" style="margin-top:0.5em; padding:0.5em 1em; background:#28a745; color:white; border:none; border-radius:5px;">
+    Copy URL
+   </button>
+  </div>
+  <h1>
+   Master GIT Cheat Sheet (Interactief)
+  </h1>
+  <div id="input-section">
+   <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+    <div>
+     <label for="filename">
+      <strong>
+       Bestandsnaam
+      </strong>
+     </label>
+     <br/>
+     <input id="filename" placeholder="toolzy_v6.swift" style="width:100%; padding:0.5em;" type="text"/>
+    </div>
+    <div>
+     <label for="pathname">
+      <strong>
+       Pad naar projectmap
+      </strong>
+     </label>
+     <br/>
+     <input id="pathname" placeholder="/Users/bramg/Dev/Toolzy" style="width:100%; padding:0.5em;" type="text"/>
+    </div>
+    <div>
+     <label for="commitsback">
+      <strong>
+       Aantal commits terug
+      </strong>
+     </label>
+     <br/>
+     <input id="commitsback" placeholder="HEAD~1" style="width:100%; padding:0.5em;" type="text"/>
+    </div>
+    <div>
+     <label for="tagname">
+      <strong>
+       Tagnaam
+      </strong>
+     </label>
+     <br/>
+     <input id="tagname" placeholder="v1.0.0" style="width:100%; padding:0.5em;" type="text"/>
+    </div>
+    <div>
+     <label for="repourl">
+      <strong>
+       GitHub Repo-URL
+      </strong>
+     </label>
+     <br/>
+     <input id="repourl" placeholder="https://github.com/username/toolzy.git" style="width:100%; padding:0.5em;" type="text"/>
+    </div>
+    <div>
+     <label for="username">
+      <strong>
+       GitHub Gebruikersnaam
+      </strong>
+     </label>
+     <br/>
+     <input id="username" placeholder="username" style="width:100%; padding:0.5em;" type="text"/>
+    </div>
+   </div>
+   <div style="width:100%; display:flex; justify-content:center; margin-top:1.5em;">
+    <button id="generate-btn" onclick="updateAll()" style="padding:0.6em 1.2em; font-size:1em; background-color:#007BFF; color:white; border:none; border-radius:5px;">
+     Generate
+    </button>
+   </div>
+  </div>
+  <div id="toc">
+   <h2>
+    📌 Overzicht van Commando’s
+   </h2>
+   <ul>
+    <li>
+     <a href="#cmd0">
+      Initialiseer nieuwe repo
+     </a>
+    </li>
+    <li>
+     <a href="#cmd1">
+      Toevoegen specifiek bestand
+     </a>
+    </li>
+    <li>
+     <a href="#cmd2">
+      Commit maken
+     </a>
+    </li>
+    <li>
+     <a href="#cmd3">
+      Checkout naar branch
+     </a>
+    </li>
+    <li>
+     <a href="#cmd4">
+      Nieuwe branch aanmaken
+     </a>
+    </li>
+    <li>
+     <a href="#cmd5">
+      Branch verwijderen
+     </a>
+    </li>
+    <li>
+     <a href="#cmd6">
+      Tag aanmaken
+     </a>
+    </li>
+    <li>
+     <a href="#cmd7">
+      Reset commit
+     </a>
+    </li>
+    <li>
+     <a href="#cmd8">
+      Remote toevoegen
+     </a>
+    </li>
+    <li>
+     <a href="#cmd9">
+      Pushen
+     </a>
+    </li>
+    <li>
+     <a href="#cmd10">
+      Push tags
+     </a>
+    </li>
+   </ul>
+  </div>
+  <section id="cmd0">
+   <h2>
+    Initialiseer nieuwe repo
+   </h2>
+   <p>
+    Start een nieuwe lokale Git-repository in je huidige map.
+   </p>
+   <pre id="code0">git init<button class="copy-btn" onclick="copyToClipboard('code0')">Copy</button></pre>
+  </section>
+  <section id="cmd1">
+   <h2>
+    Toevoegen specifiek bestand
+   </h2>
+   <p>
+    Voegt een specifiek bestand toe aan staging.
+   </p>
+   <pre id="code1">git add PATHNAME/BESTANDSNAAM<button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button></pre>
+  </section>
+  <section id="cmd2">
+   <h2>
+    Commit maken
+   </h2>
+   <p>
+    Slaat je wijzigingen op met een boodschap.
+   </p>
+   <pre id="code2">git commit -m "COMMITMSG"<button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button></pre>
+  </section>
+  <section id="cmd3">
+   <h2>
+    Checkout naar branch
+   </h2>
+   <p>
+    Wissel naar een andere branch.
+   </p>
+   <pre id="code3">git checkout BRANCHNAAM<button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button></pre>
+   <div class="branch-options">
+    <label>
+     Selecteer branch:
+    </label>
+    <br/>
+    <label>
+     <input name="branch3" onclick="updateBranch(3, 'dev')" type="radio" value="dev"/>
+     dev
+    </label>
+    <label>
+     <input name="branch3" onclick="updateBranch(3, 'main')" type="radio" value="main"/>
+     main
+    </label>
+    <label>
+     <input name="branch3" onclick="updateBranch(3, 'final')" type="radio" value="final"/>
+     final
+    </label>
+    <label>
+     <input name="branch3" onclick="updateBranch(3, 'feature-x')" type="radio" value="feature-x"/>
+     feature-x
+    </label>
+   </div>
+  </section>
+  <section id="cmd4">
+   <h2>
+    Nieuwe branch aanmaken
+   </h2>
+   <p>
+    Maakt en wisselt naar een nieuwe branch.
+   </p>
+   <pre id="code4">git checkout -b BRANCHNAAM<button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button></pre>
+   <div class="branch-options">
+    <label>
+     Selecteer branch:
+    </label>
+    <br/>
+    <label>
+     <input name="branch4" onclick="updateBranch(4, 'dev')" type="radio" value="dev"/>
+     dev
+    </label>
+    <label>
+     <input name="branch4" onclick="updateBranch(4, 'main')" type="radio" value="main"/>
+     main
+    </label>
+    <label>
+     <input name="branch4" onclick="updateBranch(4, 'final')" type="radio" value="final"/>
+     final
+    </label>
+    <label>
+     <input name="branch4" onclick="updateBranch(4, 'feature-x')" type="radio" value="feature-x"/>
+     feature-x
+    </label>
+   </div>
+  </section>
+  <section id="cmd5">
+   <h2>
+    Branch verwijderen
+   </h2>
+   <p>
+    Verwijdert een lokale branch.
+   </p>
+   <pre id="code5">git branch -d BRANCHNAAM<button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button></pre>
+   <div class="branch-options">
+    <label>
+     Selecteer branch:
+    </label>
+    <br/>
+    <label>
+     <input name="branch5" onclick="updateBranch(5, 'dev')" type="radio" value="dev"/>
+     dev
+    </label>
+    <label>
+     <input name="branch5" onclick="updateBranch(5, 'main')" type="radio" value="main"/>
+     main
+    </label>
+    <label>
+     <input name="branch5" onclick="updateBranch(5, 'final')" type="radio" value="final"/>
+     final
+    </label>
+    <label>
+     <input name="branch5" onclick="updateBranch(5, 'feature-x')" type="radio" value="feature-x"/>
+     feature-x
+    </label>
+   </div>
+  </section>
+  <section id="cmd6">
+   <h2>
+    Tag aanmaken
+   </h2>
+   <p>
+    Maakt een nieuwe tag aan.
+   </p>
+   <pre id="code6">git tag TAGNAAM<button class="copy-btn" onclick="copyToClipboard('code6')">Copy</button></pre>
+  </section>
+  <section id="cmd7">
+   <h2>
+    Reset commit
+   </h2>
+   <p>
+    Verwijdert laatste commits.
+   </p>
+   <pre id="code7">git reset --hard COMMITSBACK<button class="copy-btn" onclick="copyToClipboard('code7')">Copy</button></pre>
+  </section>
+  <section id="cmd8">
+   <h2>
+    Remote toevoegen
+   </h2>
+   <p>
+    Voegt GitHub repo toe.
+   </p>
+   <pre id="code8">git remote add origin REPOURL<button class="copy-btn" onclick="copyToClipboard('code8')">Copy</button></pre>
+  </section>
+  <section id="cmd9">
+   <h2>
+    Pushen
+   </h2>
+   <p>
+    Verstuurt commits naar GitHub.
+   </p>
+   <pre id="code9">git push -u origin BRANCHNAAM<button class="copy-btn" onclick="copyToClipboard('code9')">Copy</button></pre>
+   <div class="branch-options">
+    <label>
+     Selecteer branch:
+    </label>
+    <br/>
+    <label>
+     <input name="branch9" onclick="updateBranch(9, 'main')" type="radio" value="main"/>
+     main
+    </label>
+    <label>
+     <input name="branch9" onclick="updateBranch(9, 'dev')" type="radio" value="dev"/>
+     dev
+    </label>
+   </div>
+  </section>
+  <section id="cmd10">
+   <h2>
+    Push tags
+   </h2>
+   <p>
+    Verstuurt je tags naar GitHub.
+   </p>
+   <pre id="code10">git push origin --tags<button class="copy-btn" onclick="copyToClipboard('code10')">Copy</button></pre>
+  </section>
+  <script>
+   function copyToClipboard(id) {
+    const code = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(code.replace(/Copy$/, '').trim()).then(() => {
+        alert("Gekopieerd naar klembord!");
+    });
+}
+
+function updateBranch(index, value) {
+    const code = document.getElementById("code" + index);
+    code.childNodes[0].nodeValue = code.childNodes[0].nodeValue.replace(/BRANCHNAAM/g, value);
+}
+
+function updateAll() {
+    const filename = document.getElementById("filename").value.trim();
+    const pathname = document.getElementById("pathname").value.trim();
+    const tagname = document.getElementById("tagname").value.trim();
+    const commitsback = document.getElementById("commitsback").value.trim();
+    const repourl = document.getElementById("repourl").value.trim();
+    const username = document.getElementById("username").value.trim();
+
+    const replacements = {
+        "BESTANDSNAAM": filename,
+        "PATHNAME": pathname,
+        "TAGNAAM": tagname,
+        "COMMITSBACK": commitsback,
+        "REPOURL": repourl,
+        "USERNAME": username
+    };
+
+    for (let i = 0; i < 20; i++) {
+        const el = document.getElementById("code" + i);
+        if (!el) continue;
+        let content = el.childNodes[0].nodeValue;
+        for (const [key, val] of Object.entries(replacements)) {
+            const regex = new RegExp(key, 'g');
+            content = content.replace(regex, val);
+        }
+        el.childNodes[0].nodeValue = content;
+    }
+}
+  </script>
+  <section id="cmd100">
+   <h2>
+    Commitgeschiedenis bekijken
+   </h2>
+   <p>
+    Toont een compacte lijst van eerdere commits.
+   </p>
+   <pre id="code100">git log --oneline<button class="copy-btn" onclick="copyToClipboard('code100')">Copy</button></pre>
+  </section>
+  <section id="cmd101">
+   <h2>
+    Laatste commit ongedaan maken (zonder verlies)
+   </h2>
+   <p>
+    Houdt je wijzigingen maar haalt de commit weg.
+   </p>
+   <pre id="code101">git reset --soft COMMITSBACK<button class="copy-btn" onclick="copyToClipboard('code101')">Copy</button></pre>
+  </section>
+  <section>
+   <h2>
+    Verschillend
+   </h2>
+   <ul>
+    <li>
+     <strong>
+      Laatste wijzigingen ophalen:
+     </strong>
+     <code>
+      git pull origin BRANCHNAAM
+     </code>
+    </li>
+    <li>
+     <strong>
+      Fetch zonder automatisch mergen:
+     </strong>
+     <code>
+      git fetch
+     </code>
+    </li>
+    <li>
+     <strong>
+      Bekijk alle verschillen in bestanden:
+     </strong>
+     <code>
+      git diff
+     </code>
+    </li>
+    <li>
+     <strong>
+      Toon details van specifieke commit:
+     </strong>
+     <code>
+      git show
+      <commit>
+      </commit>
+     </code>
+    </li>
+    <li>
+     <strong>
+      Lijst van stash-entries bekijken:
+     </strong>
+     <code>
+      git stash list
+     </code>
+    </li>
+    <li>
+     <strong>
+      Details van stash bekijken:
+     </strong>
+     <code>
+      git stash show
+     </code>
+    </li>
+    <li>
+     <strong>
+      Verwijder ongeversioneerde bestanden:
+     </strong>
+     <code>
+      git clean -fd
+     </code>
+    </li>
+    <li>
+     <strong>
+      Stel gebruikersnaam in:
+     </strong>
+     <code>
+      git config --global user.name "Jouw Naam"
+     </code>
+    </li>
+    <li>
+     <strong>
+      Stel e-mailadres in:
+     </strong>
+     <code>
+      git config --global user.email "jij@email.com"
+     </code>
+    </li>
+    <li>
+     <strong>
+      Selectieve commit uit andere branch:
+     </strong>
+     <code>
+      git cherry-pick
+      <commit>
+      </commit>
+     </code>
+    </li>
+    <li>
+     <strong>
+      Interactieve rebase starten:
+     </strong>
+     <code>
+      git rebase -i HEAD~3
+     </code>
+    </li>
+    <li>
+     <strong>
+      Bestand van remote branch ophalen:
+     </strong>
+     <code>
+      git checkout origin/main -- BESTANDSNAAM
+     </code>
+    </li>
+   </ul>
+  </section>
+  <script>
+   function generateGitHubURL() {
+    const username = document.getElementById('gh-username').value || 'bramgg';
+    const repo = document.getElementById('gh-repo').value || 'GIT-cheatsheet';
+    const file = document.getElementById('gh-file').value;
+    if (!file) {
+        alert("Vul een HTML-bestandsnaam in.");
+        return;
+    }
+    const url = `https://${username}.github.io/${repo}/${file}`;
+    document.getElementById('gh-full-url').value = url;
+    document.getElementById('gh-url-output').style.display = 'block';
+}
+
+function copyGitHubURL() {
+    const copyText = document.getElementById("gh-full-url");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+}
+  </script>
+ </body>
+</html>
